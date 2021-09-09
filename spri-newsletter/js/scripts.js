@@ -50,12 +50,10 @@ jQuery(".select-post").change(function() {
 
   if(new_post.imagen) {
     jQuery("#post_"+jQuery(this).data("post-id")+" .imagen").val(new_post.imagen);
-    jQuery("#post_"+jQuery(this).data("post-id")+" .imagen_preview").removeClass("hidden");
     jQuery("#post_"+jQuery(this).data("post-id")+" .imagen_preview").empty();
     jQuery("#post_"+jQuery(this).data("post-id")+" .imagen_preview").append("<img src='"+new_post.imagen+"' />");
   } else {
     jQuery("#post_"+jQuery(this).data("post-id")+" .imagen").val("");
-    jQuery("#post_"+jQuery(this).data("post-id")+" .imagen_preview").addClass("hidden");
     jQuery("#post_"+jQuery(this).data("post-id")+" .imagen_preview").empty();             
   }
 
