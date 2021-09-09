@@ -1,0 +1,128 @@
+/* Body */
+:root {
+  --color-ayuda: #4affff;
+  --color-noticia: #f44336;
+  --color-banner: #000;
+}
+
+body {
+  background-color: #eeefef;
+  font-family: 'Ubuntu', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: 300;
+}
+h1, h2, h3, .btn {
+  font-family: 'Ubuntu', Helvetica, Arial, Verdana, sans-serif;
+  font-weight: 700;
+}
+
+select {
+  padding: 4px;
+}
+
+h4 select,
+h4 input {
+  font-size: 20px;
+  padding: 0px;
+}
+
+h5 {
+  color: #fff;
+}
+
+.pop-up-bg {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100vh;
+  z-index: 1000;
+  background-color: #4a4a4abf;
+  display: none;
+}
+
+.pop-up-bg.opened {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pop-up-bg .pop-up {
+  background-color: #efefef;
+  border-radius: 0px;
+  position: relative;
+}
+
+.pop-up {
+  position: relative;
+  max-width: 862px;
+  width: 100%;
+  max-height: 559px;
+  height: 100vh;
+}
+
+.pop-up-close {
+  right: 15px;
+  position: absolute;
+  color: #6f236f;
+  font-size: 35px;
+  width: 41px;
+  cursor: pointer;
+  top: 24px;
+}
+
+.noticia label {
+  font-size: 12px;
+  color: var(--color-noticia);
+  font-weight: 500;
+}
+
+.noticia, .ayuda, .banner {
+  background-color: #fff;
+  border: 5px solid var(--color-noticia); 
+  color: var(--color-noticia);
+}
+
+/*.noticia {
+  border-color: var(--color-noticia); 
+  color: var(--color-noticia);
+}*/
+
+.noticia h5 {
+  color: var(--color-noticia);
+}
+
+.ayuda {
+  border-color: var(--color-ayuda); 
+  color: var(--color-ayuda);
+}
+.ayuda h5 {
+  color: var(--color-ayuda);
+}
+
+.banner {
+  border-color: var(--color-banner); 
+  color: var(--color-banner);
+}
+.banner h5 {
+  color: var(--color-banner);
+}
+
+.ayuda .btn,
+.banner .btn {
+  margin-top: -4px;
+}
+
+.ayuda input, .ayuda textarea, .ayuda select {
+	border: 1px solid var(--color-ayuda);
+	background-color: #fff;
+}
+
+.noticia input, .noticia textarea, .noticia select {
+	border: 1px solid var(--color-noticia);
+	background-color: #fff;
+}
+
+
+.hidden {
+  display: none;
+}
