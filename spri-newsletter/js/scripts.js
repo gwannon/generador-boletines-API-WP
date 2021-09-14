@@ -12,7 +12,12 @@ jQuery(".newsdelete, .helpsdelete, .bannersdelete").click(function(e) {
       jQuery(this).attr("order", index);
     });
   }
-  if(jQuery(this).hasClass("helpsdelete")) jQuery("select[name=helps]").val(jQuery("select[name=helps]").val() - 1);
+  if(jQuery(this).hasClass("helpsdelete")) {
+    jQuery("select[name=helps]").val(jQuery("select[name=helps]").val() - 1);
+    jQuery("#ayudas > .ayuda_drag").each(function(index) {
+      jQuery(this).attr("order", index);
+    });    
+  }
   if(jQuery(this).hasClass("bannersdelete")) jQuery("select[name=banners]").val(jQuery("select[name=banners]").val() - 1);
 });
 
@@ -101,4 +106,25 @@ jQuery("select.formato").on('change', function() {
     jQuery(this).parent().find("input.imagen").addClass("hidden");
     jQuery(this).parent().find(".imagen_preview").addClass("hidden");
   } 
-})
+});
+
+
+jQuery(".helpsdown").click(function(e) {
+  console.log("BAJAR");
+  e.preventDefault();
+  var order = parseInt(jQuery(this).parents(".ayuda_drag").attr("order"));
+  jQuery(this).parents(".ayuda_drag").insertAfter(".ayuda_drag[order="+(order+1)+"]");
+  jQuery("#ayudas > .ayuda_drag").each(function(index) {
+    jQuery(this).attr("order", index);
+  });
+});
+
+jQuery(".helpsup").click(function(e) {
+  console.log("SUBIR");
+  e.preventDefault();
+  var order = parseInt(jQuery(this).parents(".ayuda_drag").attr("order"));
+  jQuery(this).parents(".ayuda_drag").insertBefore(".ayuda_drag[order="+(order-1)+"]");
+  jQuery("#ayudas > .ayuda_drag").each(function(index) {
+    jQuery(this).attr("order", index);
+  });
+});
