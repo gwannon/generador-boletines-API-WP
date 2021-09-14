@@ -183,33 +183,41 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
         </div>
       <?php } ?>
     </div>
+    <div id="ayudas" class="p-0 m-0">
     <?php for($i = 0; $i < $number_helps; $i++) { ?>
-      <div id="help_<?php echo $i; ?>" class="col-12 p-1">
-        <div class="p-3 rounded-3 ayuda">
-          <h5>Ayuda <?php echo ($i + 1); ?></h5>
-          <div class="row pb-2">
-            <div class="col-md-2">
-              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="width: 100%; margin-bottom: 5px;">
-                <option value="">Ayudas pregeneradas</option>
-                <?php foreach($default_helps[$lang] as $key => $default) { ?>
-                  <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
-                <?php } ?>
-              </select>
-            </div>
-            <div class="col-md-2">
-              <input id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
-            </div>
-            <div class="col-md-4">
-              <input name="help[<?php echo $i; ?>][date]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
-            </div>
-            <div class="col-md-3">
-              <input id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
-            </div>
-            <div class="col-1 text-end"><a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
-          </div>
-        </div>
+      <div id="help_<?php echo $i; ?>" class="col-12 p-1 ayuda_drag" order="<?php echo $i; ?>">
+	<div class="p-3 rounded-3 ayuda">
+	  <div class="row pb-2">
+	    <div class="col-10">
+   	      <h5>Ayuda <?php echo ($i + 1); ?></h5>
+	    </div>
+	    <div class="col-2 text-end pb-2">
+	      <a href="#" class="btn btn-danger helpsup" title="SUBIR">&#11014;</a>
+	      <a href="#" class="btn btn-danger helpsdown" title="BAJAR">&#11015;</a>
+	      <a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
+	    </div>
+	    <div class="col-md-2">
+	      <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="width: 100%; margin-bottom: 5px;">
+	        <option value="">Ayudas pregeneradas</option>
+	        <?php foreach($default_helps[$lang] as $key => $default) { ?>
+	          <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
+	        <?php } ?>
+	      </select>
+	    </div>
+	    <div class="col-md-3">
+	      <input id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
+	    </div>
+	    <div class="col-md-4">
+	      <input name="help[<?php echo $i; ?>][date]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
+	    </div>
+	    <div class="col-md-3">
+	      <input id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
+	    </div>
+	  </div>
+	</div>
       </div>
     <?php } ?>
+    </div>
     <?php for($i = 0; $i < $number_banners; $i++) { ?>
       <div id="banner_<?php echo $i; ?>" class="col-12 p-1">
         <div class="p-3 rounded-3 banner">
