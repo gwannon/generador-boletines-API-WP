@@ -21,12 +21,12 @@ function generateNewsletterHtml($intereses, $posts, $lang) {
         $temp = "<!-- %IF in_array('".implode($item['intereses'], "', \$SLASHED_TAGS) || in_array('")."', \$SLASHED_TAGS)% -->\n\n".$temp."\n\n<!-- %/IF% -->";
       }
       $temp = str_replace("[text]", ( isset($item['texto_especial']) && $item['texto_especial'] != '' ? strip_tags($item['texto_especial']) : strip_tags($posts[$item['post_id']]->excerpt->rendered)), str_replace("[link]", $posts[$item['post_id']]->link, str_replace("[title]", $posts[$item['post_id']]->title->rendered, $temp)));
-      $cat = json_decode(file_get_contents("https://spri.eus/wp-json/wp/v2/categories/". $posts[$item['post_id']]->categories[0]));
+      $cat = json_decode(file_get_contents(DOMAIN_WP."/wp-json/wp/v2/categories/". $posts[$item['post_id']]->categories[0]));
       $temp = str_replace("[category]", $cat->name, $temp);
       if($item['imagen'] != '') {
         $temp = str_replace("[image]", $item['imagen'], $temp);
       } else {
-        $current_image = json_decode(file_get_contents("https://www.spri.eus/wp-json/wp/v2/media/". $posts[$item['post_id']]->featured_media));
+        $current_image = json_decode(file_get_contents(DOMAIN_WP."/wp-json/wp/v2/media/". $posts[$item['post_id']]->featured_media));
         if($current_image->media_details->sizes->medium_large) $temp = str_replace("[image]", $current_image->media_details->sizes->medium_large->source_url, $temp);
         else $temp = str_replace("[image]", $current_image->media_details->sizes->full->source_url, $temp);
       }
@@ -155,20 +155,20 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
                 <a href="#" class="btn btn-danger newsdelete" data-delete="post_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
               </div>
               <div class="col-md-7">
-                <select name="data[<?php echo $i; ?>][post_id]" data-post-id="<?php echo $i; ?>" class="select-post" style="width: 100%;">
+                <select name="data[<?php echo $i; ?>][post_id]" data-post-id="<?php echo $i; ?>" class="select-post">
                   <option value="-1">Elegir noticia</option>
                   <?php foreach($posts as $key => $post) { ?>
                     <option value="<?php echo $key; ?>"<?php if(isset($_REQUEST['data'][$i]['post_id']) && intval($_REQUEST['data'][$i]['post_id']) == intval($key)) echo " selected='selected'"; ?>><?php echo date("Y-m-d", strtotime($post->date)); ?> - <?php echo $post->title->rendered; ?></option>
                   <?php } ?>
                 </select>
-                <select name="data[<?php echo $i; ?>][format]" class="formato" style="width: 100%;">>
+                <select name="data[<?php echo $i; ?>][format]" class="formato">>
                   <option value="">Elegir formato</option>
                   <option value="big"<?php echo ($_REQUEST['data'][$i]['format'] == 'big' ? " selected='selected'" : ""); ?>>GRANDE</option>
                   <option value="medium"<?php echo ($_REQUEST['data'][$i]['format'] == 'medium' ? " selected='selected'" : ""); ?>>MEDIANO</option>
                   <option value="small"<?php echo ($_REQUEST['data'][$i]['format'] == 'small' ? " selected='selected'" : ""); ?>>PEQUEÑO</option>
                 </select>
                 <textarea <?php echo ($_REQUEST['data'][$i]['format'] != 'big' ? " class='hidden'" : ""); ?> name="data[<?php echo $i; ?>][texto_especial]" placeholder="Rellenar este campo si queremos un texto especial para la noticia." style="width: 100%; height: 62px;"><?php echo $_REQUEST['data'][$i]['texto_especial']; ?></textarea>
-                <input class="imagen<?php echo ($_REQUEST['data'][$i]['format'] != 'big' && $_REQUEST['data'][$i]['format'] != 'medium' ? " hidden" : ""); ?>" type="text" name="data[<?php echo $i; ?>][imagen]" value="<?php echo $_REQUEST['data'][$i]['imagen']; ?>" placeholder="Imagen especial" style="width: 100%;" />
+                <input class="imagen<?php echo ($_REQUEST['data'][$i]['format'] != 'big' && $_REQUEST['data'][$i]['format'] != 'medium' ? " hidden" : ""); ?>" type="text" name="data[<?php echo $i; ?>][imagen]" value="<?php echo $_REQUEST['data'][$i]['imagen']; ?>" placeholder="Imagen especial" />
                 <div class="imagen_preview text-center"><?php if($_REQUEST['data'][$i]['imagen'] != '') { ?><img src="<?php echo $_REQUEST['data'][$i]['imagen']; ?>" /><?php } ?></div>
               </div>
               <div class="col-md-5 px-3">
@@ -197,7 +197,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
               <a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
             </div>
             <div class="col-md-2">
-              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="width: 100%; margin-bottom: 5px;">
+              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="margin-bottom: 5px;">
                 <option value="">Ayudas pregeneradas</option>
                 <?php foreach($default_helps[$lang] as $key => $default) { ?>
                   <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
@@ -205,13 +205,13 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
               </select>
             </div>
             <div class="col-md-3">
-              <input id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
+              <input type="text" id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
             </div>
             <div class="col-md-4">
-              <input name="help[<?php echo $i; ?>][date]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
+              <input type="text" name="help[<?php echo $i; ?>][date]" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
             </div>
             <div class="col-md-3">
-              <input id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
+              <input type="url" id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
             </div>
           </div>
         </div>
@@ -227,12 +227,12 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
             </div>
             <div class="col-1 text-end pb-2"><a href="#" class="btn btn-danger bannersdelete" data-delete="banner_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
             <div class="col-md-8">
-              <input name="banner[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['title']; ?>" placeholder="Título" maxlength="40" required />
-              <input name="banner[<?php echo $i; ?>][text]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['text']; ?>" placeholder="Texto" maxlength="120" required />
+              <input type="text" name="banner[<?php echo $i; ?>][title]" value="<?php echo $_REQUEST['banner'][$i]['title']; ?>" placeholder="Título" maxlength="40" required />
+              <input type="text" name="banner[<?php echo $i; ?>][text]" value="<?php echo $_REQUEST['banner'][$i]['text']; ?>" placeholder="Texto" maxlength="120" required />
             </div>
             <div class="col-md-4">
-              <input name="banner[<?php echo $i; ?>][image]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['image']; ?>" placeholder="Imagen" required />
-              <input name="banner[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['link']; ?>" placeholder="Enlace" required />
+              <input type="url" name="banner[<?php echo $i; ?>][image]" value="<?php echo $_REQUEST['banner'][$i]['image']; ?>" placeholder="Imagen" required />
+              <input type="url" name="banner[<?php echo $i; ?>][link]" value="<?php echo $_REQUEST['banner'][$i]['link']; ?>" placeholder="Enlace" required />
             </div>
           </div>
         </div>
@@ -251,21 +251,16 @@ function downloadHtml() {
   $filePath = './temp.html';
 
   if(file_exists($filePath)) {
-      $fileName = basename($filePath);
-      $fileSize = filesize($filePath);
-
-      // Output headers.
-      header("Cache-Control: private");
-      header("Content-Type: application/stream");
-      header("Content-Length: ".$fileSize);
-      header("Content-Disposition: attachment; filename=NEWSLETTER SPRI ".date("Y-m-d H:i:s").".html");
-
-      // Output file.
-      readfile ($filePath);                   
-      exit();
-  }
-  else {
-      die('The provided file path is not valid.');
+    $fileName = basename($filePath);
+    $fileSize = filesize($filePath);
+    header("Cache-Control: private");
+    header("Content-Type: application/stream");
+    header("Content-Length: ".$fileSize);
+    header("Content-Disposition: attachment; filename=NEWSLETTER SPRI ".date("Y-m-d H:i:s").".html");
+    readfile ($filePath);                   
+    exit();
+  } else {
+    die('The provided file path is not valid.');
   }
 }
 
@@ -285,7 +280,7 @@ function loadTemplate() {
 
 
 function sendTest($email) {
-  $headers = 'Content-Type: text/html; charset=UTF-8'. "\r\n" .'From: prueba@enuutisworking.com'. "\r\n" .'Reply-To: prueba@enuutisworking.com';
+  $headers = 'Content-Type: text/html; charset=UTF-8'. "\r\n" .'From: prueba@enuutisworking.com'. "\r\n" .'Reply-To: prueba@enuttisworking.com';
   if(mail($email, "PRUEBA DE NEWSLETTER SPRI ".date("Y-m-d H:i:s"), file_get_contents("temp.html"), $headers)) return true;
   else return false;
 }

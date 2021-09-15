@@ -123,6 +123,10 @@ h5 {
 }
 
 
+input[type=text], input[type=url], select, textarea {
+  width: 100%;
+}
+
 .hidden {
   display: none;
 }
