@@ -1,16 +1,16 @@
 <?php
 
-function generateNewsletterHtml($intereses, $posts) {
-  $template = [
-    'mail_es' => file_get_contents ("./templates/mail_es.html"),
-    'mail_eu' => file_get_contents ("./templates/mail_eu.html"),
-    'new_big' => file_get_contents ("./templates/new_big.html"),
-    'new_medium' => file_get_contents ("./templates/new_medium.html"),
-    'new_small' => file_get_contents ("./templates/new_small.html"),
-    'help' => file_get_contents ("./templates/help.html"),
-    'banner' => file_get_contents ("./templates/banner.html")
-  ];
+function generateNewsletterHtml($intereses, $posts, $lang) {
 
+  //Sacamos todas las plantillas
+  $files = scandir("./templates/");
+  foreach ($files as $file)  {
+    $file_parts = pathinfo($file);
+    if($file_parts['extension'] == 'html') {
+      $template[$file_parts['filename']] =  file_get_contents ("./templates/".$file);
+    }
+  }
+  
   //Noticias ------------------
   $news = '';
   foreach ($_REQUEST['data'] as $item ) {
@@ -67,7 +67,7 @@ function generateNewsletterHtml($intereses, $posts) {
   else $newsletter = str_replace("[END_IF_HELPS]", " -->", str_replace("[IF_HELPS]", "<!-- ", $newsletter));
 
   file_put_contents("temp.html", $newsletter);
-  return $newsletter;
+  return;
 }
 
 function getPosts($lang) {

@@ -60,7 +60,7 @@ if(isset($_REQUEST['download'])) {
 
             //INICIO CREACIÓN BOLETÍN
             if(isset($_REQUEST['crear']) || isset($_REQUEST['guardar'])) {
-              $newsletter = generateNewsletterHtml($intereses, $posts); ?>
+              generateNewsletterHtml($intereses, $posts, $lang); ?>
               <p class="text-center alert alert-success">Newsletter generada correctamente<br/><br/><a href='#' class="pop-up-open btn btn-primary">Previsualizar</a> <a href='<?php echo ROOT; ?>?download=yes' target='_blank' class='btn btn-secondary'>Descargar</a></p>
               <div class="pop-up-bg">
                 <div class="pop-up">
