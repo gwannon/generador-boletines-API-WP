@@ -1,21 +1,24 @@
 <?php
 
 function generateNewsletterHtml($intereses, $posts) {
-  $template['big'] = file_get_contents ("./templates/noticia_big.html");
-  $template['medium'] = file_get_contents ("./templates/noticia_medium.html");
-  $template['small'] = file_get_contents ("./templates/noticia_small.html");
-  $template['help'] = file_get_contents ("./templates/ayuda.html");
-  $template['banner'] = file_get_contents ("./templates/banner.html");
+  $template = [
+    'mail_es' => file_get_contents ("./templates/mail_es.html"),
+    'mail_eu' => file_get_contents ("./templates/mail_eu.html"),
+    'new_big' => file_get_contents ("./templates/new_big.html"),
+    'new_medium' => file_get_contents ("./templates/new_medium.html"),
+    'new_small' => file_get_contents ("./templates/new_small.html"),
+    'help' => file_get_contents ("./templates/help.html"),
+    'banner' => file_get_contents ("./templates/banner.html")
+  ];
 
   //Noticias ------------------
   $news = '';
   foreach ($_REQUEST['data'] as $item ) {
     if($item['post_id'] >= 0 && $item['format'] != '') {
-      $temp = $template[$item['format']];
+      $temp = $template['new_'.$item['format']];
       //https://help.activecampaign.com/hc/en-us/articles/220358207-How-to-use-Conditional-Content-in-emails
       if (isset($item['intereses']) && count($item['intereses']) > 0) {
-        $temp = "<!-- %IF in_array('".implode($item['intereses'], "', \$SLASHED_TAGS) || in_array('")."', \$SLASHED_TAGS)% -->\n\n".$temp;
-        $temp = $temp ."\n\n<!-- %/IF% -->";
+        $temp = "<!-- %IF in_array('".implode($item['intereses'], "', \$SLASHED_TAGS) || in_array('")."', \$SLASHED_TAGS)% -->\n\n".$temp."\n\n<!-- %/IF% -->";
       }
       $temp = str_replace("[text]", ( isset($item['texto_especial']) && $item['texto_especial'] != '' ? strip_tags($item['texto_especial']) : strip_tags($posts[$item['post_id']]->excerpt->rendered)), str_replace("[link]", $posts[$item['post_id']]->link, str_replace("[title]", $posts[$item['post_id']]->title->rendered, $temp)));
       $cat = json_decode(file_get_contents("https://spri.eus/wp-json/wp/v2/categories/". $posts[$item['post_id']]->categories[0]));
@@ -39,7 +42,6 @@ function generateNewsletterHtml($intereses, $posts) {
       $key = $i-1;
       $item = $_REQUEST['help'][$key];
       if($item['title'] != '') {
-        //$helps .= str_replace("[date]", $item['date'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['help'])));
         $helps .= replaceTags ($item, $template['help']);
       } else {
         $helps .= "<td width='33%'></td>";
@@ -54,14 +56,12 @@ function generateNewsletterHtml($intereses, $posts) {
   $banners = '';
   if(is_array($_REQUEST['banner']) && count($_REQUEST['banner']) > 0) {
     foreach($_REQUEST['banner'] as $item) {
-      //$banners .= str_replace("[text]", $item['text'], str_replace("[image]", $item['image'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['banner']))));
       $banners .= replaceTags ($item, $template['banner']); 
     }
   }
 
-  //Genearamos la plantilla
-  if($lang == 'eu') $newsletter = str_replace("[BANNERS]", $banners, str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla_eu.html")))));
-  else $newsletter = str_replace("[BANNERS]", $banners, str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla.html")))));
+  //Generamos la plantilla
+  $newsletter = str_replace("[BANNERS]", $banners, str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, str_replace("[NEWS]", $news, $template['mail_'.$lang]))));
 
   if(is_array($_REQUEST['help']) && count($_REQUEST['help']) > 0) $newsletter = str_replace("[END_IF_HELPS]", "", str_replace("[IF_HELPS]", "", $newsletter));
   else $newsletter = str_replace("[END_IF_HELPS]", " -->", str_replace("[IF_HELPS]", "<!-- ", $newsletter));
@@ -71,7 +71,6 @@ function generateNewsletterHtml($intereses, $posts) {
 }
 
 function getPosts($lang) {
-  //return json_decode(file_get_contents(DOMAIN_WP."/wp-json/wp/v2/posts?per_page=100&lang=".$lang));
   return json_decode(file_get_contents(DOMAIN_WP."/wp-json/wp/v2/posts?orderby=date&order=desc&after=".date('Y-m-d', strtotime('-'.DAYS.' days'))."T00:00:00&per_page=100&lang=".$lang."&nocache=".date("YmdHis")));
 }
 
@@ -151,13 +150,8 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
             <div class="row">
               <div class="col-6"><h5>Noticia <?php echo ($i + 1); ?></h5></div>
               <div class="col-6 text-end">
-                
                 <a href="#" class="btn btn-danger newsup" title="SUBIR">&#11014;</a>
                 <a href="#" class="btn btn-danger newsdown" title="BAJAR">&#11015;</a>
-              
-
-
-              
                 <a href="#" class="btn btn-danger newsdelete" data-delete="post_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
               </div>
               <div class="col-md-7">
@@ -192,35 +186,35 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
     <div id="ayudas" class="p-0 m-0">
     <?php for($i = 0; $i < $number_helps; $i++) { ?>
       <div id="help_<?php echo $i; ?>" class="col-12 p-1 ayuda_drag" order="<?php echo $i; ?>">
-	<div class="p-3 rounded-3 ayuda">
-	  <div class="row pb-2">
-	    <div class="col-10">
-   	      <h5>Ayuda <?php echo ($i + 1); ?></h5>
-	    </div>
-	    <div class="col-2 text-end pb-2">
-	      <a href="#" class="btn btn-danger helpsup" title="SUBIR">&#11014;</a>
-	      <a href="#" class="btn btn-danger helpsdown" title="BAJAR">&#11015;</a>
-	      <a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
-	    </div>
-	    <div class="col-md-2">
-	      <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="width: 100%; margin-bottom: 5px;">
-	        <option value="">Ayudas pregeneradas</option>
-	        <?php foreach($default_helps[$lang] as $key => $default) { ?>
-	          <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
-	        <?php } ?>
-	      </select>
-	    </div>
-	    <div class="col-md-3">
-	      <input id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
-	    </div>
-	    <div class="col-md-4">
-	      <input name="help[<?php echo $i; ?>][date]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
-	    </div>
-	    <div class="col-md-3">
-	      <input id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
-	    </div>
-	  </div>
-	</div>
+        <div class="p-3 rounded-3 ayuda">
+          <div class="row pb-2">
+            <div class="col-10">
+                <h5>Ayuda <?php echo ($i + 1); ?></h5>
+            </div>
+            <div class="col-2 text-end pb-2">
+              <a href="#" class="btn btn-danger helpsup" title="SUBIR">&#11014;</a>
+              <a href="#" class="btn btn-danger helpsdown" title="BAJAR">&#11015;</a>
+              <a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
+            </div>
+            <div class="col-md-2">
+              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="width: 100%; margin-bottom: 5px;">
+                <option value="">Ayudas pregeneradas</option>
+                <?php foreach($default_helps[$lang] as $key => $default) { ?>
+                  <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input id="select-help-title-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['title']; ?>" placeholder="Título" required />
+            </div>
+            <div class="col-md-4">
+              <input name="help[<?php echo $i; ?>][date]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['date']; ?>" placeholder="Fecha" required />
+            </div>
+            <div class="col-md-3">
+              <input id="select-help-url-<?php echo ($i + 1); ?>" name="help[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['help'][$i]['link']; ?>" placeholder="Enlace" required />
+            </div>
+          </div>
+        </div>
       </div>
     <?php } ?>
     </div>
@@ -240,7 +234,6 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
               <input name="banner[<?php echo $i; ?>][image]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['image']; ?>" placeholder="Imagen" required />
               <input name="banner[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['link']; ?>" placeholder="Enlace" required />
             </div>
-
           </div>
         </div>
       </div>
