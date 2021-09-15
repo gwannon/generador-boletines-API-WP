@@ -75,7 +75,7 @@ function getPosts($lang) {
 }
 
 function getHelps($lang) {
-  if (isset($lang) && $lang == 'eu') $ayudas_id = 124735;
+  if ($lang == 'eu') $ayudas_id = 124735;
   else $ayudas_id = 124655;
   $default_helps = array();
   $pages = json_decode(file_get_contents(DOMAIN_WP."/wp-json/wp/v2/pages?parent=".$ayudas_id."&per_page=100&lang=".$lang));
@@ -99,14 +99,14 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
   </script>
   <form action="<?php echo ROOT; ?>" method="post" class="row">
     <div class="col-3 p-3">
-      <h4 style="text-align: center">Idioma<br/>
+      <h4 class="text-center">Idioma<br/>
       <select name="lang" onchange="this.form.submit()">
         <option value="es"<?php echo ($lang == "es" ? " selected='selected'" : ""); ?>>ES</option>
         <option value="eu"<?php echo ($lang == "eu" ? " selected='selected'" : ""); ?>>EU</option>
       </select></h4>
     </div>
     <div class="col-3 p-3">
-      <h4 style="text-align: center">Noticias<br/>
+      <h4 class="text-center">Noticias<br/>
       <select name="news" onchange="this.form.submit()">
         <option value="0">0</option>
         <?php for($i = 1; $i < 100; $i++) { ?>
@@ -115,7 +115,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
       </select></h4>
     </div>
     <div class="col-3 p-3">
-      <h4 style="text-align: center">Ayudas<br/>
+      <h4 class="text-center">Ayudas<br/>
       <select name="helps" onchange="this.form.submit()">
         <option value="0">0</option>
         <?php for($i = 1; $i < 100; $i++) { ?>
@@ -124,7 +124,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
       </select><input type="text" name="ano" value="<?php echo (isset($_REQUEST['ano']) && $_REQUEST['ano'] != '' ? $_REQUEST['ano'] : date("Y")); ?>" placeholder="Fecha de las ayudas" style="width: 90px;"/></h4>
     </div>
     <div class="col-3 p-3">
-      <h4 style="text-align: center">Banners<br/>
+      <h4 class="text-center">Banners<br/>
       <select name="banners" onchange="this.form.submit()">
         <option value="0">0</option>
         <?php for($i = 1; $i < 100; $i++) { ?>
@@ -134,7 +134,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
     </div>
     <?php if(isset($_REQUEST['crear']) || isset($_REQUEST['guardar']) || isset($_REQUEST['test'])) { ?>
       <div class="row p-1">
-        <div class="col-md-3"><input type="email" name="test_email" style="width: 100%; padding: 5px;" value="" placeholder="Email de prueba" /></div>
+        <div class="col-md-3"><input type="email" name="test_email" class="p-1" value="" placeholder="Email de prueba" /></div>
         <div class="col-md-3"><input type="submit" name="test" value="Enviar prueba" class="btn btn-primary" /></div>
       </div>
     <?php } ?>
@@ -149,7 +149,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
           <div class="p-3 rounded-3 noticia">
             <div class="row">
               <div class="col-6"><h5>Noticia <?php echo ($i + 1); ?></h5></div>
-              <div class="col-6 text-end">
+              <div class="col-6 text-end pb-2">
                 <a href="#" class="btn btn-danger newsup" title="SUBIR">&#11014;</a>
                 <a href="#" class="btn btn-danger newsdown" title="BAJAR">&#11015;</a>
                 <a href="#" class="btn btn-danger newsdelete" data-delete="post_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
@@ -167,7 +167,7 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
                   <option value="medium"<?php echo ($_REQUEST['data'][$i]['format'] == 'medium' ? " selected='selected'" : ""); ?>>MEDIANO</option>
                   <option value="small"<?php echo ($_REQUEST['data'][$i]['format'] == 'small' ? " selected='selected'" : ""); ?>>PEQUEÑO</option>
                 </select>
-                <textarea <?php echo ($_REQUEST['data'][$i]['format'] != 'big' ? " class='hidden'" : ""); ?> name="data[<?php echo $i; ?>][texto_especial]" placeholder="Rellenar este campo si queremos un texto especial para la noticia." style="width: 100%; height: 62px;"><?php echo $_REQUEST['data'][$i]['texto_especial']; ?></textarea>
+                <textarea <?php echo ($_REQUEST['data'][$i]['format'] != 'big' ? " class='hidden'" : ""); ?> name="data[<?php echo $i; ?>][texto_especial]" placeholder="Rellenar este campo si queremos un texto especial para la noticia." style="height: 62px;"><?php echo $_REQUEST['data'][$i]['texto_especial']; ?></textarea>
                 <input class="imagen<?php echo ($_REQUEST['data'][$i]['format'] != 'big' && $_REQUEST['data'][$i]['format'] != 'medium' ? " hidden" : ""); ?>" type="text" name="data[<?php echo $i; ?>][imagen]" value="<?php echo $_REQUEST['data'][$i]['imagen']; ?>" placeholder="Imagen especial" />
                 <div class="imagen_preview text-center"><?php if($_REQUEST['data'][$i]['imagen'] != '') { ?><img src="<?php echo $_REQUEST['data'][$i]['imagen']; ?>" /><?php } ?></div>
               </div>
@@ -188,16 +188,14 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
       <div id="help_<?php echo $i; ?>" class="col-12 p-1 ayuda_drag" order="<?php echo $i; ?>">
         <div class="p-3 rounded-3 ayuda">
           <div class="row pb-2">
-            <div class="col-10">
-                <h5>Ayuda <?php echo ($i + 1); ?></h5>
-            </div>
-            <div class="col-2 text-end pb-2">
+            <div class="col-6"><h5>Ayuda <?php echo ($i + 1); ?></h5></div>
+            <div class="col-6 text-end pb-2">
               <a href="#" class="btn btn-danger helpsup" title="SUBIR">&#11014;</a>
               <a href="#" class="btn btn-danger helpsdown" title="BAJAR">&#11015;</a>
               <a href="#" class="btn btn-danger helpsdelete" data-delete="help_<?php echo $i; ?>" title="BORRAR">&#10006;</a>
             </div>
             <div class="col-md-2">
-              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" style="margin-bottom: 5px;">
+              <select name="help[<?php echo $i; ?>][default]" id="select-help-<?php echo ($i + 1); ?>" class="select-help" class="p-1">
                 <option value="">Ayudas pregeneradas</option>
                 <?php foreach($default_helps[$lang] as $key => $default) { ?>
                   <option value="<?php echo $default['url']; ?>"<?php echo ($default['url'] == $_REQUEST['help'][$i]['default'] ? " selected='selected'" : ""); ?>><?php echo $default['title']; ?></option>
@@ -222,10 +220,10 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
       <div id="banner_<?php echo $i; ?>" class="col-12 p-1">
         <div class="p-3 rounded-3 banner">
           <div class="row pb-2">
-            <div class="col-11">
+            <div class="col-6">
               <h5>Banner <?php echo ($i + 1); ?></h5>
             </div>
-            <div class="col-1 text-end pb-2"><a href="#" class="btn btn-danger bannersdelete" data-delete="banner_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
+            <div class="col-6 text-end pb-2"><a href="#" class="btn btn-danger bannersdelete" data-delete="banner_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
             <div class="col-md-8">
               <input type="text" name="banner[<?php echo $i; ?>][title]" value="<?php echo $_REQUEST['banner'][$i]['title']; ?>" placeholder="Título" maxlength="40" required />
               <input type="text" name="banner[<?php echo $i; ?>][text]" value="<?php echo $_REQUEST['banner'][$i]['text']; ?>" placeholder="Texto" maxlength="120" required />

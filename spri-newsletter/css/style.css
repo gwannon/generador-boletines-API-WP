@@ -19,11 +19,6 @@ select {
   padding: 4px;
 }
 
-h4 select,
-h4 input {
-  font-size: 20px;
-  padding: 0px;
-}
 
 h5 {
   color: #fff;
@@ -129,4 +124,12 @@ input[type=text], input[type=url], select, textarea {
 
 .hidden {
   display: none;
+}
+
+
+h4 select,
+h4 input {
+  font-size: 20px;
+  padding: 0px;
+  max-width: 80px;
 }
