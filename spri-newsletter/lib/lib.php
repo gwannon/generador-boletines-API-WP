@@ -38,7 +38,8 @@ function generateNewsletterHtml($intereses, $posts) {
       $key = $i-1;
       $item = $_REQUEST['help'][$key];
       if($item['title'] != '') {
-        $helps .= $temp = str_replace("[date]", $item['date'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['help'])));
+        //$helps .= str_replace("[date]", $item['date'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['help'])));
+        $helps .= replaceTags ($item, $template['help']);
       } else {
         $helps .= "<td width='33%'></td>";
       }
@@ -55,7 +56,8 @@ function generateNewsletterHtml($intereses, $posts) {
   $banners = '';
   if(is_array($_REQUEST['banner']) && count($_REQUEST['banner']) > 0) {
     foreach($_REQUEST['banner'] as $item) {
-      $banners .= str_replace("[image]", $item['image'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['banner'])));
+      //$banners .= str_replace("[text]", $item['text'], str_replace("[image]", $item['image'], str_replace("[link]", $item['link'], str_replace("[title]", $item['title'], $template['banner']))));
+      $banners .= replaceTags ($item, $template['banner']); 
     }
   }
   $newsletter = str_replace("[BANNERS]", $banners, $newsletter);
@@ -221,18 +223,20 @@ function generateForm($number, $posts, $number_helps, $default_helps, $number_ba
     <?php for($i = 0; $i < $number_banners; $i++) { ?>
       <div id="banner_<?php echo $i; ?>" class="col-12 p-1">
         <div class="p-3 rounded-3 banner">
-          <h5>Banner <?php echo ($i + 1); ?></h5>
           <div class="row pb-2">
-            <div class="col-md-3">
-              <input name="banner[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['title']; ?>" placeholder="Título" required />
+            <div class="col-11">
+              <h5>Banner <?php echo ($i + 1); ?></h5>
+            </div>
+            <div class="col-1 text-end pb-2"><a href="#" class="btn btn-danger bannersdelete" data-delete="banner_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
+            <div class="col-md-8">
+              <input name="banner[<?php echo $i; ?>][title]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['title']; ?>" placeholder="Título" maxlength="40" required />
+              <input name="banner[<?php echo $i; ?>][text]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['text']; ?>" placeholder="Texto" maxlength="120" required />
             </div>
             <div class="col-md-4">
               <input name="banner[<?php echo $i; ?>][image]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['image']; ?>" placeholder="Imagen" required />
-            </div>
-            <div class="col-md-4">
               <input name="banner[<?php echo $i; ?>][link]" style="width: 100%;" value="<?php echo $_REQUEST['banner'][$i]['link']; ?>" placeholder="Enlace" required />
             </div>
-            <div class="col-1 text-end"><a href="#" class="btn btn-danger bannersdelete" data-delete="banner_<?php echo $i; ?>" title="BORRAR">&#10006;</a></div>
+
           </div>
         </div>
       </div>
@@ -287,4 +291,11 @@ function sendTest($email) {
   $headers = 'Content-Type: text/html; charset=UTF-8'. "\r\n" .'From: prueba@enuutisworking.com'. "\r\n" .'Reply-To: prueba@enuutisworking.com';
   if(mail($email, "PRUEBA DE NEWSLETTER SPRI ".date("Y-m-d H:i:s"), file_get_contents("temp.html"), $headers)) return true;
   else return false;
+}
+
+function replaceTags ($item, $html) {
+  foreach ($item as $tag => $value) {
+    $html = str_replace("[".$tag."]", $value, $html);
+  }
+  return $html;
 }
