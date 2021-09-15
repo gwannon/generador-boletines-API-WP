@@ -6,6 +6,8 @@ function generateNewsletterHtml($intereses, $posts) {
   $template['small'] = file_get_contents ("./templates/noticia_small.html");
   $template['help'] = file_get_contents ("./templates/ayuda.html");
   $template['banner'] = file_get_contents ("./templates/banner.html");
+
+  //Noticias ------------------
   $news = '';
   foreach ($_REQUEST['data'] as $item ) {
     if($item['post_id'] >= 0 && $item['format'] != '') {
@@ -28,9 +30,8 @@ function generateNewsletterHtml($intereses, $posts) {
     } else $temp = "";
     $news .= $temp;
   }
-  if($lang == 'eu') $newsletter = str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla_eu.html"));
-  else $newsletter = str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla.html"));
 
+  //Ayudas -------------
   $helps = '';
   if(is_array($_REQUEST['help']) && count($_REQUEST['help']) > 0) {
     $max = ceil(count($_REQUEST['help'])/3) * 3;
@@ -47,12 +48,9 @@ function generateNewsletterHtml($intereses, $posts) {
         $helps .= "</tr><tr>";                
       }
     }
-    $newsletter = str_replace("[END_IF_HELPS]", "", str_replace("[IF_HELPS]", "", $newsletter));
-  } else {
-    $newsletter = str_replace("[END_IF_HELPS]", " -->", str_replace("[IF_HELPS]", "<!-- ", $newsletter));
   }
-  $newsletter = str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, $newsletter));
 
+  //Banners ------------------
   $banners = '';
   if(is_array($_REQUEST['banner']) && count($_REQUEST['banner']) > 0) {
     foreach($_REQUEST['banner'] as $item) {
@@ -60,7 +58,13 @@ function generateNewsletterHtml($intereses, $posts) {
       $banners .= replaceTags ($item, $template['banner']); 
     }
   }
-  $newsletter = str_replace("[BANNERS]", $banners, $newsletter);
+
+  //Genearamos la plantilla
+  if($lang == 'eu') $newsletter = str_replace("[BANNERS]", $banners, str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla_eu.html")))));
+  else $newsletter = str_replace("[BANNERS]", $banners, str_replace("[YEAR]", $_REQUEST['ano'], str_replace("[HELPS]", $helps, str_replace("[NEWS]", $news, file_get_contents ("./templates/plantilla.html")))));
+
+  if(is_array($_REQUEST['help']) && count($_REQUEST['help']) > 0) $newsletter = str_replace("[END_IF_HELPS]", "", str_replace("[IF_HELPS]", "", $newsletter));
+  else $newsletter = str_replace("[END_IF_HELPS]", " -->", str_replace("[IF_HELPS]", "<!-- ", $newsletter));
 
   file_put_contents("temp.html", $newsletter);
   return $newsletter;
